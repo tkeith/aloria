@@ -3,12 +3,11 @@ import { z } from "zod";
 
 async function main() {
   await runAgenticConversation({
-    system:
-      "You are a helpful assistant with access to a calculator. Use the calculator tool when needed to perform calculations.",
     messages: [
       {
         role: "user",
-        content: "What is the result of (12 + 34) * 5678?",
+        content:
+          "Help answer the folloinwg question:\n\nWhat is the result of (12 + 34) * 5678?",
       },
     ],
     tools: [

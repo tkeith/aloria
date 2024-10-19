@@ -18,7 +18,7 @@ export type ModelOpts = {
 
 export type ConversationOpts = {
   modelOpts?: ModelOpts;
-  system: string;
+  system?: string;
   messages: Array<MessageParam>;
   tools?: Array<ToolDefinition<unknown>>;
   onNoToolUse?: () => Promise<OnNoToolUseAction>;
