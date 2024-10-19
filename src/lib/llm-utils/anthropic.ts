@@ -280,10 +280,6 @@ async function generateAssistantMessage(
 
   const assistantMessage = await completion.finalMessage();
 
-  console.log(
-    `assistantMessage:\n${JSON.stringify(assistantMessage, null, 2)}`,
-  );
-
   // log tool usage
   const toolUsageLines: Array<string> = [];
 
@@ -342,6 +338,10 @@ async function handleLLMResponse(
             conversationOpts: toolResult.conversationOpts,
           };
         } else if (toolResult.type === "tool_result") {
+          console.log(
+            `\n*** Providing tool result ***\n${JSON.stringify(toolResult, null, 2)}\n`,
+          );
+
           toolResultContentBlocks.push({
             type: "tool_result",
             // TODO: figure out why this is a type error in vscode (vscode bug?)
