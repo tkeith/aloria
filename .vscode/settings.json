@@ -1,0 +1,20 @@
+{
+  "search.exclude": {
+    ".next": true,
+    "node_modules": true,
+    "*.tsbuildinfo": true
+  },
+  "javascript.preferences.importModuleSpecifier": "non-relative",
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "prettier.configPath": "prettier.config.js",
+  "editor.tabSize": 2,
+  "eslint.workingDirectories": [
+    {
+      "mode": "auto"
+    }
+  ],
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true
+}
