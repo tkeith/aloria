@@ -12,6 +12,7 @@ export const env = createEnv({
       .default("development"),
     GEMINI_API_KEY: z.string(),
     ANTHROPIC_API_KEY: z.string(),
+    DYNAMIC_ENV_ID: z.string(),
   },
 
   /**
@@ -20,7 +21,7 @@ export const env = createEnv({
    * `NEXT_PUBLIC_`.
    */
   client: {
-    // NEXT_PUBLIC_CLIENTVAR: z.string(),
+    NEXT_PUBLIC_DYNAMIC_ENV_ID: z.string(),
   },
 
   /**
@@ -31,7 +32,8 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
     GEMINI_API_KEY: process.env.GEMINI_API_KEY,
     ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
-    // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
+    DYNAMIC_ENV_ID: process.env.DYNAMIC_ENV_ID,
+    NEXT_PUBLIC_DYNAMIC_ENV_ID: process.env.NEXT_PUBLIC_DYNAMIC_ENV_ID,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

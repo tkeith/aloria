@@ -1,3 +1,4 @@
+import { checkAuth } from "@/server/api/procedures/checkAuth";
 import {
   createCallerFactory,
   createTRPCRouter,
@@ -10,11 +11,7 @@ import {
  * Procedures from api/procedures should be added here.
  */
 export const appRouter = createTRPCRouter({
-  // add procedures and subrouters here
-  // when we add a real procedure, remove this placeholder
-  placeholderProcedure: procedure.query(() => {
-    return "placeholder";
-  }),
+  checkAuth,
 });
 
 // export type definition of API

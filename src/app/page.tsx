@@ -1,14 +1,25 @@
 "use client";
 
-export default function Home() {
+import { Main } from "@/components/main";
+import { env } from "@/env";
+import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
+import {
+  DynamicContextProvider,
+  DynamicWidget,
+} from "@dynamic-labs/sdk-react-core";
+
+const App = () => {
   return (
-    <main>
-      <div className="flex h-screen items-center justify-center">
-        <div className="max-w-sm rounded-lg bg-white p-8 text-center shadow-lg">
-          <h2 className="mb-4 text-xl font-bold">Hello world!</h2>
-          <p>Your app is running.</p>
-        </div>
-      </div>
-    </main>
+    <DynamicContextProvider
+      settings={{
+        environmentId: env.NEXT_PUBLIC_DYNAMIC_ENV_ID,
+        walletConnectors: [EthereumWalletConnectors],
+      }}
+    >
+      <DynamicWidget />
+      <Main />
+    </DynamicContextProvider>
   );
-}
+};
+
+export default App;
