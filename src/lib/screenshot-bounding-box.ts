@@ -1,34 +1,36 @@
 import { env } from "@/env";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import sharp from 'sharp';
-import fs from 'fs';
-import path from 'path';
+import sharp from "sharp";
+import fs from "fs";
+import path from "path";
 
 interface Coordinates {
-    xmin: number;
-    ymin: number;
-    xmax: number;
-    ymax: number;
+  xmin: number;
+  ymin: number;
+  xmax: number;
+  ymax: number;
 }
 
-async function fileToGenerativePart(file: Buffer): Promise<{ inlineData: { data: string, mimeType: string } }> {
-    return {
-        inlineData: {
-            data: file.toString('base64'),
-            mimeType: 'image/jpeg'
-        }
-    };
+async function fileToGenerativePart(
+  file: Buffer,
+): Promise<{ inlineData: { data: string; mimeType: string } }> {
+  return {
+    inlineData: {
+      data: file.toString("base64"),
+      mimeType: "image/jpeg",
+    },
+  };
 }
 
 function extractCoordinates(text: string): Coordinates[] {
-    const regex = /\[\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\]/g;
-    const matches = text.matchAll(regex);
-    return Array.from(matches).map(match => ({
-        ymin: parseInt(match[1]!) / 1000,
-        xmin: parseInt(match[2]!) / 1000,
-        ymax: parseInt(match[3]!) / 1000,
-        xmax: parseInt(match[4]!) / 1000
-    }));
+  const regex = /\[\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\]/g;
+  const matches = text.matchAll(regex);
+  return Array.from(matches).map((match) => ({
+    ymin: parseInt(match[1]!) / 1000,
+    xmin: parseInt(match[2]!) / 1000,
+    ymax: parseInt(match[3]!) / 1000,
+    xmax: parseInt(match[4]!) / 1000,
+  }));
 }
 
 async function drawBoundingBox(
@@ -65,80 +67,86 @@ export async function getElementBoundingBox({
   image: Buffer;
   elementDescription: string;
 }): Promise<{ boundingBox: Coordinates; screenshotWithBoundingBox: Buffer }> {
-    const apiKey = env.GEMINI_API_KEY;
-    if (!apiKey) {
-        throw new Error("GEMINI_API_KEY is not set in the environment variables");
+  const apiKey = env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error("GEMINI_API_KEY is not set in the environment variables");
+  }
+
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest" });
+
+  try {
+    const processedImage = await resizeAndCompressImage(image);
+    const metadata = await sharp(processedImage).metadata();
+
+    if (!metadata.width || !metadata.height) {
+      throw new Error("Unable to determine processed image dimensions");
     }
 
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest" });
+    const imagePart = await fileToGenerativePart(processedImage);
+    const prompt = `Return a bounding box as a JSON array [ymin, xmin, ymax, xmax] for this clickable element: ${elementDescription}`;
 
-    try {
-        const processedImage = await resizeAndCompressImage(image);
-        const metadata = await sharp(processedImage).metadata();
+    const result = await model.generateContent([prompt, imagePart]);
+    const response = result.response;
+    const coordinates = extractCoordinates(response.text());
 
-        if (!metadata.width || !metadata.height) {
-            throw new Error("Unable to determine processed image dimensions");
-        }
+    if (coordinates.length > 0 && coordinates[0]) {
+      const { xmin, ymin, xmax, ymax } = coordinates[0];
 
-        const imagePart = await fileToGenerativePart(processedImage);
-        const prompt = `Return a bounding box as a JSON array [ymin, xmin, ymax, xmax] for this clickable element: ${elementDescription}`;
+      // Get original image dimensions
+      const originalMetadata = await sharp(image).metadata();
+      const originalWidth = originalMetadata.width;
+      const originalHeight = originalMetadata.height;
 
-        const result = await model.generateContent([prompt, imagePart]);
-        const response = await result.response;
-        const coordinates = extractCoordinates(response.text());
+      if (!originalWidth || !originalHeight) {
+        throw new Error("Unable to determine original image dimensions");
+      }
 
-        if (coordinates.length > 0 && coordinates[0]) {
-            const { xmin, ymin, xmax, ymax } = coordinates[0];
+      // Convert coordinates back to original image dimensions
+      const boundingBox = {
+        ymin: Math.round(ymin * originalHeight),
+        xmin: Math.round(xmin * originalWidth),
+        ymax: Math.round(ymax * originalHeight),
+        xmax: Math.round(xmax * originalWidth),
+      };
 
-            // Get original image dimensions
-            const originalMetadata = await sharp(image).metadata();
-            const originalWidth = originalMetadata.width;
-            const originalHeight = originalMetadata.height;
+      // Create img-history folder if it doesn't exist
+      const imgHistoryFolder = path.join(process.cwd(), "img-history");
+      if (!fs.existsSync(imgHistoryFolder)) {
+        fs.mkdirSync(imgHistoryFolder);
+      }
 
-            if (!originalWidth || !originalHeight) {
-                throw new Error("Unable to determine original image dimensions");
-            }
+      // Generate a unique filename
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+      const outputPath = path.join(
+        imgHistoryFolder,
+        `bounding-box-${timestamp}.jpg`,
+      );
 
-            // Convert coordinates back to original image dimensions
-            const boundingBox = {
-                ymin: Math.round(ymin * originalHeight),
-                xmin: Math.round(xmin * originalWidth),
-                ymax: Math.round(ymax * originalHeight),
-                xmax: Math.round(xmax * originalWidth)
-            };
+      // Draw the bounding box and save the image
+      const screenshotWithBoundingBox = await drawBoundingBox(
+        image,
+        boundingBox,
+      );
+      console.log(`Image with bounding box saved to: ${outputPath}`);
 
-            // Create img-history folder if it doesn't exist
-            const imgHistoryFolder = path.join(process.cwd(), 'img-history');
-            if (!fs.existsSync(imgHistoryFolder)) {
-                fs.mkdirSync(imgHistoryFolder);
-            }
-
-            // Generate a unique filename
-            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-            const outputPath = path.join(imgHistoryFolder, `bounding-box-${timestamp}.jpg`);
-
-            // Draw the bounding box and save the image
-            const screenshotWithBoundingBox = await drawBoundingBox(image, boundingBox);
-            console.log(`Image with bounding box saved to: ${outputPath}`);
-
-            return { boundingBox, screenshotWithBoundingBox }
-        } else {
-            throw new Error("No valid coordinates found in the response");
-        }
-    } catch (error) {
-        console.error("Error getting coordinates:", error);
-        throw error;
+      return { boundingBox, screenshotWithBoundingBox };
+    } else {
+      throw new Error("No valid coordinates found in the response");
     }
+  } catch (error) {
+    console.error("Error getting coordinates:", error);
+    throw error;
+  }
 }
 
 async function resizeAndCompressImage(imageBuffer: Buffer): Promise<Buffer> {
-    const image = sharp(imageBuffer);
-    const metadata = await image.metadata();
+  const image = sharp(imageBuffer);
+  const metadata = await image.metadata();
 
-    if (metadata.width && metadata.width > 1000) {
-        image.resize({ width: 1000 });
-    }
+  if (metadata.width && metadata.width > 1000) {
+    image.resize({ width: 1000 });
+  }
 
-    return image.jpeg({ quality: 70 }).toBuffer();
+  return image.jpeg({ quality: 70 }).toBuffer();
 }

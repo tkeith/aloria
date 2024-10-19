@@ -59,7 +59,9 @@ async function main() {
     console.log(`Image with bounding box saved to: ${outputPath}`);
 
     // Keep the script running
-    await new Promise(() => {});
+    await new Promise(() => {
+      // nothing
+    });
   } finally {
     await browser.close();
   }
