@@ -10,9 +10,16 @@ contract Aloria {
         string task;
     }
 
+    struct Prompt {
+        string content;
+        address creator;
+    }
+
     Request[] public requests;
+    Prompt[] public prompts;
 
     event RequestStarted(uint256 requestId, string task, address promptOwner);
+    event PromptPublished(uint256 promptId, string content, address creator);
 
     function startRequest(string memory task) public payable {
         // transfer 1 satoshi from the caller to the contract
@@ -40,5 +47,11 @@ contract Aloria {
         require(msg.value > 0, "Bounty amount must be greater than 0");
         unblockerBountyByAddress[msg.sender] += msg.value;
         emit UnblockerBountyPosted(msg.sender, msg.value);
+    }
+
+    function publishPrompt(string memory promptContent) public {
+        uint256 promptId = prompts.length;
+        prompts.push(Prompt(promptContent, msg.sender));
+        emit PromptPublished(promptId, promptContent, msg.sender);
     }
 }

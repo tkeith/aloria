@@ -9,6 +9,7 @@ import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { isEthereumWallet } from "@dynamic-labs/ethereum";
 import { ABI } from "@/lib/abi";
 import { ADDRESSES } from "@/lib/addresses";
+import toast from "react-hot-toast";
 
 interface NewRequestProps {
   onSelectRequest: (extid: string | null) => void;
@@ -16,13 +17,19 @@ interface NewRequestProps {
 
 export function NewRequest({ onSelectRequest }: NewRequestProps) {
   const [isContextModalOpen, setIsContextModalOpen] = useState(false);
+  const [selectedPrompt, setSelectedPrompt] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
     formState: { errors },
+    getValues,
+    setValue,
   } = useForm<{ taskDescription: string }>();
   const authToken = useAuthToken();
   const { primaryWallet, network } = useDynamicContext();
+
+  // Fetch prompts
+  const { data: promptsData } = api.getPrompts.useQuery({});
 
   // log network on change
   useEffect(() => {
@@ -37,17 +44,70 @@ export function NewRequest({ onSelectRequest }: NewRequestProps) {
     address = ADDRESSES.find((a) => a.name === network)?.address;
   }
 
-  if (!address) {
-    throw new Error(`No address for network ${network}`);
-  }
-
   const createRequestMutation = api.createRequest.useMutation({
     onSuccess: (data) => {
       onSelectRequest(data.extid);
     },
   });
 
+  const publishPromptMutation = api.publishPrompt.useMutation();
+
+  if (!address) {
+    return null;
+  }
+
   const onSubmit = async (data: { taskDescription: string }) => {
+    if (!primaryWallet || !isEthereumWallet(primaryWallet)) {
+      return;
+    }
+
+    const walletClient = await primaryWallet.getWalletClient();
+
+    let creatorAddress: string | undefined = undefined;
+
+    if (selectedPrompt) {
+      creatorAddress = promptsData?.prompts.find(
+        (p) => p.content === selectedPrompt,
+      )?.createdByAddress;
+    }
+
+    if (!creatorAddress) {
+      await walletClient.writeContract({
+        abi: ABI,
+        address: address,
+        functionName: "startRequest",
+        args: [data.taskDescription],
+        value: BigInt(1),
+      });
+    } else {
+      await walletClient.writeContract({
+        abi: ABI,
+        address: address,
+        functionName: "startRequestFromOwnedPrompt",
+        args: [data.taskDescription, creatorAddress],
+        value: BigInt(2),
+      });
+    }
+
+    createRequestMutation.mutate({
+      authToken,
+      taskDescription: data.taskDescription,
+    });
+  };
+
+  const publishPrompt = async () => {
+    // This is a dummy function for now
+    console.log("Publish Prompt clicked");
+    // You can add more functionality here in the future
+    // log the current prompt
+    const prompt = getValues("taskDescription");
+    if (prompt.trim() === "") {
+      toast.error("Prompt cannot be empty");
+      return;
+    }
+
+    console.log(prompt);
+
     if (!primaryWallet || !isEthereumWallet(primaryWallet)) {
       return;
     }
@@ -57,15 +117,24 @@ export function NewRequest({ onSelectRequest }: NewRequestProps) {
     await walletClient.writeContract({
       abi: ABI,
       address: address,
-      functionName: "startRequest",
-      args: [data.taskDescription],
-      value: BigInt(1),
+      functionName: "publishPrompt",
+      args: [prompt],
+      value: BigInt(0),
     });
 
-    createRequestMutation.mutate({
+    await publishPromptMutation.mutateAsync({
       authToken,
-      taskDescription: data.taskDescription,
+      prompt,
+      createdByAddress: primaryWallet.address,
     });
+
+    toast.success("Prompt published");
+  };
+
+  const handlePromptSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedPromptContent = e.target.value;
+    setSelectedPrompt(selectedPromptContent);
+    setValue("taskDescription", selectedPromptContent);
   };
 
   return (
@@ -94,7 +163,7 @@ export function NewRequest({ onSelectRequest }: NewRequestProps) {
               </p>
             )}
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-8">
             <button
               type="submit"
               className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
@@ -111,6 +180,25 @@ export function NewRequest({ onSelectRequest }: NewRequestProps) {
             >
               Edit Context
             </button>
+            <button
+              type="button"
+              className="text-blue-500 hover:text-blue-700"
+              onClick={publishPrompt}
+            >
+              Publish Prompt
+            </button>
+            <select
+              onChange={handlePromptSelect}
+              value={selectedPrompt || ""}
+              className="rounded border p-2"
+            >
+              <option value="">Select a prompt</option>
+              {promptsData?.prompts.slice(0, 10).map((prompt, index) => (
+                <option key={index} value={prompt.content}>
+                  {prompt.name}
+                </option>
+              ))}
+            </select>
           </div>
         </form>
       </div>

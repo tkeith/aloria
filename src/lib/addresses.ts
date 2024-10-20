@@ -6,6 +6,6 @@ export const ADDRESSES: Array<{
   {
     name: "story",
     chainId: 1513,
-    address: "0x9636a966C88389fB66394f862DAdA89F85FC78F6",
+    address: "0x99c278ac17894f0999aBc01ba508034D96C46B75",
   },
 ];

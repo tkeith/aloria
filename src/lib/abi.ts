@@ -5,6 +5,31 @@ export const ABI = [
       {
         indexed: false,
         internalType: "uint256",
+        name: "promptId",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "string",
+        name: "content",
+        type: "string",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "creator",
+        type: "address",
+      },
+    ],
+    name: "PromptPublished",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint256",
         name: "requestId",
         type: "uint256",
       },
@@ -48,6 +73,43 @@ export const ABI = [
     name: "postUnblockerBounty",
     outputs: [],
     stateMutability: "payable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    name: "prompts",
+    outputs: [
+      {
+        internalType: "string",
+        name: "content",
+        type: "string",
+      },
+      {
+        internalType: "address",
+        name: "creator",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "string",
+        name: "promptContent",
+        type: "string",
+      },
+    ],
+    name: "publishPrompt",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
   {

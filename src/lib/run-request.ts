@@ -1,4 +1,4 @@
-import { generateRequestName } from "@/lib/generate-request-name";
+import { generateName } from "@/lib/generate-name";
 import { runBrowserTask } from "@/lib/run-browser-task";
 import { HistoricalAction } from "@/lib/take-browser-action";
 import { ParsedJson } from "@/lib/utils";
@@ -25,7 +25,13 @@ export async function runRequest({ requestId }: { requestId: number }) {
 
     await db.request.update({
       where: { id: requestId },
-      data: { name: await generateRequestName({ task: request.task }) },
+      data: {
+        name: await generateName({
+          userMessage:
+            "Generate a name (around 5 words) for a request with the following task:\n\n" +
+            request.task,
+        }),
+      },
     });
 
     async function onStepStarted() {

@@ -17,6 +17,7 @@ model User {
   context String @default("")
 
   requests Request[]
+  createdPrompts Prompt[]
 }
 
 enum RequestStatus {
@@ -58,4 +59,15 @@ model Step {
   actionDescription String?
 
   request Request @relation(fields: [requestId], references: [id])
+}
+
+model Prompt {
+  id Int @id @default(autoincrement())
+  name String
+  content String
+  createdAt DateTime @default(now())
+  createdByUserId Int
+  createdByAddress String
+
+  createdByUser User @relation(fields: [createdByUserId], references: [id])
 }

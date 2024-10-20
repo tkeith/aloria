@@ -2,22 +2,20 @@ import { defineTool, runAgenticConversation } from "@/lib/llm-utils/anthropic";
 import assert from "assert";
 import { z } from "zod";
 
-export async function generateRequestName({ task }: { task: string }) {
+export async function generateName({ userMessage }: { userMessage: string }) {
   let name = null as string | null;
 
   await runAgenticConversation({
     messages: [
       {
         role: "user",
-        content:
-          "Generate a name (around 5 words) for a request with the following task:\n\n" +
-          task,
+        content: userMessage,
       },
     ],
     tools: [
       defineTool({
         name: "submit_name",
-        description: "Submit a name for a request",
+        description: "Submit a name",
         inputSchema: z.object({
           name: z.string(),
         }),

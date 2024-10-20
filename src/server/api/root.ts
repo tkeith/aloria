@@ -10,6 +10,8 @@ import {
 } from "@/server/api/trpc";
 import { getRequest } from "@/server/api/procedures/getRequest";
 import { getRequests } from "@/server/api/procedures/getRequests";
+import { publishPrompt } from "@/server/api/procedures/publishPrompt";
+import { getPrompts } from "@/server/api/procedures/getPrompts";
 
 /**
  * This is the primary router for your server.
@@ -24,6 +26,8 @@ export const appRouter = createTRPCRouter({
   createRequest,
   getRequests,
   getRequest,
+  publishPrompt,
+  getPrompts,
 });
 
 // export type definition of API
