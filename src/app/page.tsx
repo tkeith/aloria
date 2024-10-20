@@ -51,7 +51,9 @@ const InsideDynamicContext = () => {
       {isAuthedQuery.isPending ? (
         <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100">
           <div className="w-96 rounded-lg bg-white p-8 text-center shadow-lg">
-            <h2 className="mb-4 text-2xl font-bold text-blue-500">Loading</h2>
+            <h2 className="mb-4 text-2xl font-bold text-blue-500">
+              Welcome to Aloria
+            </h2>
             <p className="text-gray-600">Please wait...</p>
           </div>
         </main>

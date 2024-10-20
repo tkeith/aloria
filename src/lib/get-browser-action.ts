@@ -99,6 +99,8 @@ ${
 Current page screenshot attached.
 
 First, describe what you see in the screenshot, including interactive components and whether they seem to be clickable and/or disabled. Pay special attention to loading indicators and overlays, which we may need to wait for or dismiss. Based on this, think about whether the last step worked or not. If the last step didn't work, consider trying other options rather than trying the same thing again. Finally, describe what to do next, and execute it with the "take_browser_action" tool.
+
+If you are struggling with a dropdown after a few tries, try clicking and typing on it.
 `.trim()
 }
 `.trim();
