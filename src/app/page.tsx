@@ -131,11 +131,11 @@ const myEvmNetworks = [
     blockExplorerUrls: [],
   },
   {
-    chainId: 1564830818,
-    networkId: 1564830818,
+    chainId: 974399131,
+    networkId: 974399131,
     chainName: "SKALE Network",
     name: "SKALE Network",
-    rpcUrls: ["https://mainnet.skalenodes.com/v1/honorable-steel-rasalhague"],
+    rpcUrls: ["https://testnet.skalenodes.com/v1/giant-half-dual-testnet"],
     iconUrls: [],
     nativeCurrency: {
       name: "SKALE",

@@ -9,9 +9,10 @@ export const createRequest = procedure
     z.object({
       authToken: z.string(),
       taskDescription: z.string(),
+      address: z.string().optional(),
     }),
   )
-  .mutation(async ({ input: { authToken, taskDescription } }) => {
+  .mutation(async ({ input: { authToken, taskDescription, address } }) => {
     const userId = await trpcGetUserId({ authToken });
 
     const newRequest = await db.request.create({
@@ -21,6 +22,14 @@ export const createRequest = procedure
         extid: crypto.randomUUID(),
       },
     });
+
+    // update user address if it's set
+    if (address) {
+      await db.user.update({
+        where: { id: userId },
+        data: { address },
+      });
+    }
 
     runRequest({
       requestId: newRequest.id,

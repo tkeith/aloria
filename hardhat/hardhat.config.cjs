@@ -46,9 +46,9 @@ module.exports = {
       chainId: 31,
     },
     skale: {
-      url: "https://mainnet.skalenodes.com/v1/honorable-steel-rasalhague",
+      url: "https://testnet.skalenodes.com/v1/giant-half-dual-testnet",
       accounts: [process.env.PRIVATE_KEY],
-      chainId: 1564830818,
+      chainId: 974399131,
     },
   },
 };

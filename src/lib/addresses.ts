@@ -45,7 +45,7 @@ export const ADDRESSES: Array<{
   },
   {
     name: "skale",
-    chainId: 1564830818,
-    address: "0x9636a966C88389fB66394f862DAdA89F85FC78F6", // need funds, didn't deploy yet
+    chainId: 974399131,
+    address: "0x9636a966C88389fB66394f862DAdA89F85FC78F6",
   },
 ];

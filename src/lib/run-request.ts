@@ -2,6 +2,7 @@ import { generateName } from "@/lib/generate-name";
 import { runBrowserTask } from "@/lib/run-browser-task";
 import { HistoricalAction } from "@/lib/take-browser-action";
 import { ParsedJson } from "@/lib/utils";
+import { xmtpSendMessage } from "@/lib/xtmp-send-message";
 import { db } from "@/server/db";
 
 export async function runRequest({ requestId }: { requestId: number }) {
@@ -17,13 +18,19 @@ export async function runRequest({ requestId }: { requestId: number }) {
       if (currentStepId === null) {
         return;
       }
-      await db.step.update({
+      const updatedStep = await db.step.update({
         where: { id: currentStepId },
         data: { status: "Completed" },
       });
+      if (updatedStep.actionDescription && request.user.address) {
+        await xmtpSendMessage(
+          request.user.address,
+          "Completed step: " + updatedStep.actionDescription,
+        );
+      }
     }
 
-    await db.request.update({
+    const newRequest = await db.request.update({
       where: { id: requestId },
       data: {
         name: await generateName({
@@ -33,6 +40,13 @@ export async function runRequest({ requestId }: { requestId: number }) {
         }),
       },
     });
+
+    if (request.user.address) {
+      await xmtpSendMessage(
+        request.user.address,
+        "Request started: " + newRequest.name,
+      );
+    }
 
     async function onStepStarted() {
       await setLatestStepToCompleted();
@@ -97,6 +111,13 @@ export async function runRequest({ requestId }: { requestId: number }) {
       where: { id: requestId },
       data: { status: "Completed", result },
     });
+
+    if (request.user.address) {
+      await xmtpSendMessage(
+        request.user.address,
+        "Request completed: " + newRequest.name + "\n\n" + result,
+      );
+    }
   } catch (e) {
     console.error(e);
     await db.request.update({

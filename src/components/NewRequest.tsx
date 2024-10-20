@@ -10,6 +10,7 @@ import { isEthereumWallet } from "@dynamic-labs/ethereum";
 import { ABI } from "@/lib/abi";
 import { ADDRESSES } from "@/lib/addresses";
 import toast from "react-hot-toast";
+import { promiseWithResolvers } from "@/lib/promise-with-resolvers";
 
 interface NewRequestProps {
   onSelectRequest: (extid: string | null) => void;
@@ -57,6 +58,16 @@ export function NewRequest({ onSelectRequest }: NewRequestProps) {
   }
 
   const onSubmit = async (data: { taskDescription: string }) => {
+    const { promise, resolve, reject } = promiseWithResolvers<void>();
+
+    toast
+      .promise(promise, {
+        loading: "Creating request...",
+        success: "Request created",
+        error: "Error creating request",
+      })
+      .catch(reject);
+
     if (!primaryWallet || !isEthereumWallet(primaryWallet)) {
       return;
     }
@@ -89,13 +100,29 @@ export function NewRequest({ onSelectRequest }: NewRequestProps) {
       });
     }
 
-    createRequestMutation.mutate({
+    // wait 3 seconds
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
+    await createRequestMutation.mutateAsync({
       authToken,
       taskDescription: data.taskDescription,
+      address: primaryWallet.address,
     });
+
+    resolve();
   };
 
   const publishPrompt = async () => {
+    const { promise, resolve, reject } = promiseWithResolvers<void>();
+
+    toast
+      .promise(promise, {
+        loading: "Publishing prompt...",
+        success: "Prompt published",
+        error: "Error publishing prompt",
+      })
+      .catch(reject);
+
     // This is a dummy function for now
     console.log("Publish Prompt clicked");
     // You can add more functionality here in the future
@@ -122,13 +149,16 @@ export function NewRequest({ onSelectRequest }: NewRequestProps) {
       value: BigInt(0),
     });
 
+    // wait 3 seconds
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
     await publishPromptMutation.mutateAsync({
       authToken,
       prompt,
       createdByAddress: primaryWallet.address,
     });
 
-    toast.success("Prompt published");
+    resolve();
   };
 
   const handlePromptSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
