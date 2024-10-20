@@ -2,6 +2,7 @@ import { generateName } from "@/lib/generate-name";
 import { runBrowserTask } from "@/lib/run-browser-task";
 import { HistoricalAction } from "@/lib/take-browser-action";
 import { ParsedJson } from "@/lib/utils";
+import { uploadToWalrus } from "@/lib/walrus-upload";
 import { xmtpSendMessage } from "@/lib/xtmp-send-message";
 import { db } from "@/server/db";
 
@@ -66,6 +67,11 @@ export async function runRequest({ requestId }: { requestId: number }) {
       if (!currentStepId) {
         throw new Error("No current step");
       }
+
+      const oldStep = await db.step.findUniqueOrThrow({
+        where: { id: currentStepId },
+      });
+
       if (opts.actionJson) {
         await db.step.update({
           where: { id: currentStepId },
@@ -78,22 +84,49 @@ export async function runRequest({ requestId }: { requestId: number }) {
           data: { actionDescription: opts.actionDescription },
         });
       }
-      if (opts.startingScreenshot) {
+      if (opts.startingScreenshot && oldStep.startingScreenshot === null) {
         await db.step.update({
           where: { id: currentStepId },
           data: { startingScreenshot: opts.startingScreenshot },
         });
+
+        await db.step.update({
+          where: { id: currentStepId },
+          data: {
+            startingScreenshotWalrusBlob: await uploadToWalrus(
+              opts.startingScreenshot,
+            ),
+          },
+        });
       }
-      if (opts.annotatedScreenshot) {
+      if (opts.annotatedScreenshot && oldStep.annotatedScreenshot === null) {
         await db.step.update({
           where: { id: currentStepId },
           data: { annotatedScreenshot: opts.annotatedScreenshot },
         });
+
+        await db.step.update({
+          where: { id: currentStepId },
+          data: {
+            annotatedScreenshotWalrusBlob: await uploadToWalrus(
+              opts.annotatedScreenshot,
+            ),
+          },
+        });
       }
-      if (opts.endingScreenshot) {
+      if (opts.endingScreenshot && oldStep.endingScreenshot === null) {
         await db.step.update({
           where: { id: currentStepId },
           data: { endingScreenshot: opts.endingScreenshot },
+        });
+
+        await db.step.update({
+          where: { id: currentStepId },
+          data: {
+            endingScreenshotWalrusBlob: await uploadToWalrus(
+              opts.endingScreenshot,
+            ),
+          },
         });
       }
     }

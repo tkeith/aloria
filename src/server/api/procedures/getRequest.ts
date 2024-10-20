@@ -51,6 +51,9 @@ export const getRequest = procedure
           annotatedScreenshotBase64:
             step.annotatedScreenshot?.toString("base64"),
           endingScreenshotBase64: step.endingScreenshot?.toString("base64"),
+          startingScreenshotWalrusBlob: step.startingScreenshotWalrusBlob,
+          annotatedScreenshotWalrusBlob: step.annotatedScreenshotWalrusBlob,
+          endingScreenshotWalrusBlob: step.endingScreenshotWalrusBlob,
         })),
       },
     };

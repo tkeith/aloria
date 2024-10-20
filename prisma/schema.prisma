@@ -54,8 +54,11 @@ model Step {
   requestId Int
   status StepStatus @default(Pending)
   startingScreenshot Bytes?
+  startingScreenshotWalrusBlob String?
   annotatedScreenshot Bytes?
+  annotatedScreenshotWalrusBlob String?
   endingScreenshot Bytes?
+  endingScreenshotWalrusBlob String?
   actionJson String?
   actionDescription String?
 

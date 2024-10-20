@@ -15,6 +15,9 @@ export function RequestDetails({ selectedRequestExtid }: RequestDetailsProps) {
   const authToken = useAuthToken();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState("");
+  const [selectedDownloadUrl, setSelectedDownloadUrl] = useState<string | null>(
+    null,
+  );
 
   const requestQuery = api.getRequest.useQuery(
     {
@@ -33,8 +36,9 @@ export function RequestDetails({ selectedRequestExtid }: RequestDetailsProps) {
   const { task, status, result, name, extid, steps } =
     requestQuery.data.request;
 
-  const openModal = (imageUrl: string) => {
+  const openModal = (imageUrl: string, downloadUrl: string | null) => {
     setSelectedImage(imageUrl);
+    setSelectedDownloadUrl(downloadUrl);
     setModalOpen(true);
   };
 
@@ -69,20 +73,34 @@ export function RequestDetails({ selectedRequestExtid }: RequestDetailsProps) {
               </div>
               <div className="flex space-x-2">
                 {[
-                  step.startingScreenshotBase64,
-                  step.annotatedScreenshotBase64,
-                  step.endingScreenshotBase64,
+                  {
+                    url: step.startingScreenshotBase64,
+                    downloadUrl: step.startingScreenshotWalrusBlob,
+                  },
+                  {
+                    url: step.annotatedScreenshotBase64,
+                    downloadUrl: step.annotatedScreenshotWalrusBlob,
+                  },
+                  {
+                    url: step.endingScreenshotBase64,
+                    downloadUrl: step.endingScreenshotWalrusBlob,
+                  },
                 ].map((screenshot, i) => (
                   <div key={i} className="h-[211px] w-[125px] bg-gray-100">
-                    {screenshot ? (
+                    {screenshot.url ? (
                       <Image
-                        src={`data:image/png;base64,${screenshot}`}
+                        src={`data:image/png;base64,${screenshot.url}`}
                         alt={`Screenshot ${i + 1}`}
                         width={125}
                         height={211}
                         className="cursor-pointer border border-gray-400 object-cover"
                         onClick={() =>
-                          openModal(`data:image/png;base64,${screenshot}`)
+                          openModal(
+                            `data:image/png;base64,${screenshot.url}`,
+                            screenshot.downloadUrl &&
+                              "https://aggregator.walrus-testnet.walrus.space/v1/" +
+                                screenshot.downloadUrl,
+                          )
                         }
                       />
                     ) : (
@@ -99,6 +117,7 @@ export function RequestDetails({ selectedRequestExtid }: RequestDetailsProps) {
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         imageUrl={selectedImage}
+        downloadUrl={selectedDownloadUrl}
       />
     </div>
   );
