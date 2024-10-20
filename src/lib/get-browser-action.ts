@@ -72,7 +72,7 @@ ${opts.task}
 </task>
 
 ${
-  opts.userContext === undefined
+  opts.userContext === undefined || opts.userContext.trim() === ""
     ? ""
     : `
 We have some additional context from the user:
