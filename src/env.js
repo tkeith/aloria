@@ -13,6 +13,8 @@ export const env = createEnv({
     GEMINI_API_KEY: z.string(),
     ANTHROPIC_API_KEY: z.string(),
     DYNAMIC_ENV_ID: z.string(),
+    WALLET_ADDRESS: z.string(),
+    WALLET_PRIVATE_KEY: z.string(),
   },
 
   /**
@@ -34,6 +36,8 @@ export const env = createEnv({
     ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
     DYNAMIC_ENV_ID: process.env.DYNAMIC_ENV_ID,
     NEXT_PUBLIC_DYNAMIC_ENV_ID: process.env.NEXT_PUBLIC_DYNAMIC_ENV_ID,
+    WALLET_ADDRESS: process.env.WALLET_ADDRESS,
+    WALLET_PRIVATE_KEY: process.env.WALLET_PRIVATE_KEY,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
