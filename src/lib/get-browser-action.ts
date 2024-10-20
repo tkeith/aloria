@@ -46,6 +46,7 @@ export type Action =
     }
   | {
       type: "task_complete";
+      result: string;
     };
 
 export async function getNextAction(opts: {
@@ -147,7 +148,7 @@ First, describe what you see in the screenshot, including interactive components
           result: z.string().describe("The result of the task"),
         }),
         func: async ({ input, conversation }) => {
-          action = { type: "task_complete" };
+          action = { type: "task_complete", result: input.result };
           return {
             type: "end_conversation",
           };

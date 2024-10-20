@@ -8,6 +8,7 @@ export type HistoricalAction = {
   action: BrowserAction;
   actionDescription: string;
   screenshotWithBoundingBox: Buffer | null;
+  screenshotAfterAction: Buffer;
 };
 
 export async function takeBrowserAction(opts: {
@@ -84,5 +85,6 @@ export async function takeBrowserAction(opts: {
     action: opts.action,
     actionDescription: opts.actionDescription,
     screenshotWithBoundingBox,
+    screenshotAfterAction: await page.screenshot({ fullPage: false }),
   };
 }
