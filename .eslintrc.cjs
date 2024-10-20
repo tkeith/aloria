@@ -34,6 +34,7 @@ const config = {
       },
     ],
     "tailwindcss/classnames-order": "off",
+    "tailwindcss/migration-from-tailwind-2": "off",
   },
 };
 module.exports = config;
