@@ -2,7 +2,7 @@ import { generateName } from "@/lib/generate-name";
 import { runBrowserTask } from "@/lib/run-browser-task";
 import { HistoricalAction } from "@/lib/take-browser-action";
 import { ParsedJson } from "@/lib/utils";
-import { uploadToWalrus } from "@/lib/walrus-upload";
+import { walrusUploadWithRetry } from "@/lib/walrus-upload";
 import { xmtpSendMessage } from "@/lib/xtmp-send-message";
 import { db } from "@/server/db";
 
@@ -90,13 +90,17 @@ export async function runRequest({ requestId }: { requestId: number }) {
           data: { startingScreenshot: opts.startingScreenshot },
         });
 
-        await db.step.update({
-          where: { id: currentStepId },
-          data: {
-            startingScreenshotWalrusBlob: await uploadToWalrus(
-              opts.startingScreenshot,
-            ),
-          },
+        (async function () {
+          await db.step.update({
+            where: { id: currentStepId },
+            data: {
+              startingScreenshotWalrusBlob: await walrusUploadWithRetry(
+                opts.startingScreenshot!,
+              ),
+            },
+          });
+        })().catch((e) => {
+          console.error("Error uploading starting screenshot to Walrus", e);
         });
       }
       if (opts.annotatedScreenshot && oldStep.annotatedScreenshot === null) {
@@ -105,13 +109,17 @@ export async function runRequest({ requestId }: { requestId: number }) {
           data: { annotatedScreenshot: opts.annotatedScreenshot },
         });
 
-        await db.step.update({
-          where: { id: currentStepId },
-          data: {
-            annotatedScreenshotWalrusBlob: await uploadToWalrus(
-              opts.annotatedScreenshot,
-            ),
-          },
+        (async function () {
+          await db.step.update({
+            where: { id: currentStepId },
+            data: {
+              annotatedScreenshotWalrusBlob: await walrusUploadWithRetry(
+                opts.annotatedScreenshot!,
+              ),
+            },
+          });
+        })().catch((e) => {
+          console.error("Error uploading annotated screenshot to Walrus", e);
         });
       }
       if (opts.endingScreenshot && oldStep.endingScreenshot === null) {
@@ -120,13 +128,17 @@ export async function runRequest({ requestId }: { requestId: number }) {
           data: { endingScreenshot: opts.endingScreenshot },
         });
 
-        await db.step.update({
-          where: { id: currentStepId },
-          data: {
-            endingScreenshotWalrusBlob: await uploadToWalrus(
-              opts.endingScreenshot,
-            ),
-          },
+        (async function () {
+          await db.step.update({
+            where: { id: currentStepId },
+            data: {
+              endingScreenshotWalrusBlob: await walrusUploadWithRetry(
+                opts.endingScreenshot!,
+              ),
+            },
+          });
+        })().catch((e) => {
+          console.error("Error uploading ending screenshot to Walrus", e);
         });
       }
     }

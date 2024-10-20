@@ -1,0 +1,21 @@
+#!/bin/bash
+
+set -e
+
+cd `dirname $0`
+
+npm run typecheck
+npm run lint
+
+ssh root@aloria.ai "docker stop aloria || true"
+
+rsync -a --delete --exclude node_modules --exclude .git --exclude .next --exclude .env --exclude hardhat ./ root@aloria.ai:/root/aloria
+
+ssh root@aloria.ai "cd /root/aloria && cp prod.env .env && /root/.local/share/pnpm/pnpm dlx codapt@latest run"
+
+# tell the user deploy is done, press enter to ssh into the server and see the docker logs
+echo "Deploy complete. Press Enter to SSH into the server and see the docker logs."
+
+read -n 1 -s -r -p "Press Enter to SSH into the server and see the docker logs..."
+
+ssh root@aloria.ai "docker logs -f aloria"
