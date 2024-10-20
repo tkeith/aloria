@@ -51,6 +51,7 @@ export type Action =
 
 export async function getNextAction(opts: {
   task: string; // what the user is trying to do
+  userContext?: string; // additional context about the user
   history: HistoricalAction[]; // what we have done so far
   currentPage: null | {
     url: string;
@@ -65,11 +66,21 @@ export async function getNextAction(opts: {
   const userMessage = `\
 We are helping a disabled user accomplish a task on the web. We need to give their automated browser control assistant very specific instructions for each step.
 
+Task:
 <task>
 ${opts.task}
 </task>
 
-Here are the instructions that have already been executed:
+${
+  opts.userContext === undefined
+    ? ""
+    : `
+We have some additional context from the user:
+<user_context>
+${opts.userContext}
+</user_context>
+`.trim() + "\n\n"
+}Here are the instructions that have already been executed:
 ${opts.history.length === 0 ? "(none yet)" : opts.history.map((h) => `- ${h.actionDescription}`).join("\n")}
 
 ${

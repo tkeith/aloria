@@ -3,12 +3,14 @@ import { procedure } from "@/server/api/trpc";
 import { db } from "@/server/db";
 import { z } from "zod";
 
-export const getUserInfo = procedure
+export const getUserContext = procedure
   .input(z.object({ authToken: z.string() }))
   .query(async ({ input: { authToken } }) => {
     const userId = await trpcGetUserId({ authToken });
+
     const user = await db.user.findUniqueOrThrow({ where: { id: userId } });
+
     return {
-      email: user.email,
+      userContext: user.context,
     };
   });

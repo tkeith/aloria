@@ -1,4 +1,5 @@
 import { env } from "@/env";
+import { db } from "@/server/db";
 import { TRPCError } from "@trpc/server";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { JwksClient } from "jwks-rsa";
@@ -41,12 +42,8 @@ export async function getUserInfoFromAuthToken({
   };
 }
 
-export async function trpcGetUserInfoFromAuthTokenOrThrow({
-  encodedJwt,
-}: {
-  encodedJwt: string;
-}) {
-  const userInfo = await getUserInfoFromAuthToken({ encodedJwt });
+export async function trpcGetUserId({ authToken }: { authToken: string }) {
+  const userInfo = await getUserInfoFromAuthToken({ encodedJwt: authToken });
 
   if (!userInfo.authenticated) {
     throw new TRPCError({
@@ -55,5 +52,11 @@ export async function trpcGetUserInfoFromAuthTokenOrThrow({
     });
   }
 
-  return { email: userInfo.email };
+  let user = await db.user.findUnique({ where: { email: userInfo.email } });
+  if (!user) {
+    // create new user
+    user = await db.user.create({ data: { email: userInfo.email } });
+  }
+
+  return user.id;
 }

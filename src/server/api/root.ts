@@ -1,5 +1,8 @@
 import { checkAuth } from "@/server/api/procedures/checkAuth";
+import { getUserContext } from "@/server/api/procedures/getUserContext";
 import { getUserInfo } from "@/server/api/procedures/getUserInfo";
+import { setUserContext } from "@/server/api/procedures/setUserContext";
+import { createRequest } from "@/server/api/procedures/createRequest";
 import {
   createCallerFactory,
   createTRPCRouter,
@@ -14,6 +17,9 @@ import {
 export const appRouter = createTRPCRouter({
   checkAuth,
   getUserInfo,
+  getUserContext,
+  setUserContext,
+  createRequest,
 });
 
 // export type definition of API

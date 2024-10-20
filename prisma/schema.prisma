@@ -19,11 +19,20 @@ model User {
   requests Request[]
 }
 
+enum RequestStatus {
+  Pending
+  Completed
+}
+
 model Request {
   id Int @id @default(autoincrement())
+  extid String @unique
   createdAt DateTime @default(now())
   userId Int
+  name String @default("Loading...")
   task String
+  status RequestStatus @default(Pending)
+  result String @default("")
 
   user User @relation(fields: [userId], references: [id])
   steps Step[]
@@ -31,12 +40,14 @@ model Request {
 
 model Step {
   id Int @id @default(autoincrement())
+  extid String @unique
   createdAt DateTime @default(now())
   requestId Int
-  startingScreenshot Bytes
-  endingScreenshot Bytes
-  actionJson String
-  actionDescription String
+  startingScreenshot Bytes?
+  annotatedScreenshot Bytes?
+  endingScreenshot Bytes?
+  actionJson String?
+  actionDescription String?
 
   request Request @relation(fields: [requestId], references: [id])
 }

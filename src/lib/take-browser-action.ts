@@ -1,5 +1,6 @@
 import { BrowserAction } from "@/lib/get-browser-action";
 import { twoPassGetElementBoundingBox } from "@/lib/screenshot-bounding-box";
+import { ParsedJson } from "@/lib/utils";
 import assert from "assert";
 import { Browser, Page } from "playwright";
 
@@ -18,6 +19,12 @@ export async function takeBrowserAction(opts: {
   page: Page;
   screenshot: Buffer | null;
   gotScreenshotAt: Date;
+  onStepUpdated?: (opts: {
+    actionJson?: ParsedJson;
+    actionDescription?: string;
+    startingScreenshot?: Buffer;
+    annotatedScreenshot?: Buffer;
+  }) => Promise<void>;
 }): Promise<HistoricalAction> {
   let screenshotWithBoundingBox: Buffer | null = null;
 
@@ -42,6 +49,12 @@ export async function takeBrowserAction(opts: {
     });
 
     screenshotWithBoundingBox = screenshotWithBoundingBox_;
+
+    if (opts.onStepUpdated) {
+      await opts.onStepUpdated({
+        annotatedScreenshot: screenshotWithBoundingBox,
+      });
+    }
 
     const { xmin, ymin, xmax, ymax } = boundingBox; // fractions
 
