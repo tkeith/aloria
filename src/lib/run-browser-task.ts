@@ -10,9 +10,14 @@ export async function runBrowserTask({ task }: { task: string }): Promise<{
 }> {
   const { browser, page } = await startChromiumBrowser();
   const history: HistoricalAction[] = [];
-  while (true) {
-    let currentPage: null | { url: string; screenshot: Buffer } = null;
 
+  const number_of_actions = 50;
+  while (true) {
+    if (history.length >= number_of_actions) {
+      throw new Error("Number of actions exceeded.");
+    }
+
+    let currentPage: null | { url: string; screenshot: Buffer } = null;
     const url = page.url();
 
     if (url !== "about:blank") {
