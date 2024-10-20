@@ -1,10 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useAuthToken } from "@/lib/use-auth-token-hook";
 import { api } from "@/trpc/react";
 import { UserContextEditorModal } from "./UserContextEditorModal";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { isEthereumWallet } from "@dynamic-labs/ethereum";
+import { ABI } from "@/lib/abi";
+import { ADDRESSES } from "@/lib/addresses";
 
 interface NewRequestProps {
   onSelectRequest: (extid: string | null) => void;
@@ -18,6 +22,24 @@ export function NewRequest({ onSelectRequest }: NewRequestProps) {
     formState: { errors },
   } = useForm<{ taskDescription: string }>();
   const authToken = useAuthToken();
+  const { primaryWallet, network } = useDynamicContext();
+
+  // log network on change
+  useEffect(() => {
+    console.log("network", network);
+  }, [network]);
+
+  let address;
+  // if network is number throw
+  if (typeof network === "number") {
+    address = ADDRESSES.find((a) => a.chainId === network)?.address;
+  } else {
+    address = ADDRESSES.find((a) => a.name === network)?.address;
+  }
+
+  if (!address) {
+    throw new Error(`No address for network ${network}`);
+  }
 
   const createRequestMutation = api.createRequest.useMutation({
     onSuccess: (data) => {
@@ -25,7 +47,21 @@ export function NewRequest({ onSelectRequest }: NewRequestProps) {
     },
   });
 
-  const onSubmit = (data: { taskDescription: string }) => {
+  const onSubmit = async (data: { taskDescription: string }) => {
+    if (!primaryWallet || !isEthereumWallet(primaryWallet)) {
+      return;
+    }
+
+    const walletClient = await primaryWallet.getWalletClient();
+
+    await walletClient.writeContract({
+      abi: ABI,
+      address: address,
+      functionName: "startRequest",
+      args: [data.taskDescription],
+      value: BigInt(1),
+    });
+
     createRequestMutation.mutate({
       authToken,
       taskDescription: data.taskDescription,
