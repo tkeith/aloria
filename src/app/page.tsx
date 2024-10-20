@@ -7,6 +7,7 @@ import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import {
   DynamicContextProvider,
   DynamicWidget,
+  mergeNetworks,
   useDynamicContext,
 } from "@dynamic-labs/sdk-react-core";
 import { useQuery } from "@tanstack/react-query";
@@ -72,12 +73,88 @@ const InsideDynamicContext = () => {
   );
 };
 
+const myEvmNetworks = [
+  {
+    chainId: 296,
+    networkId: 296,
+    chainName: "Hedera Testnet",
+    name: "Hedera Testnet",
+    rpcUrls: ["https://testnet.hashio.io/api"],
+    iconUrls: [],
+    nativeCurrency: {
+      name: "Hedera",
+      symbol: "HBAR",
+      decimals: 18,
+    },
+    blockExplorerUrls: [],
+  },
+  {
+    chainId: 22040,
+    networkId: 22040,
+    chainName: "Airdao Testnet",
+    name: "Airdao Testnet",
+    rpcUrls: ["https://network.ambrosus-test.io"],
+    iconUrls: [],
+    nativeCurrency: {
+      name: "Airdao",
+      symbol: "AIR",
+      decimals: 18,
+    },
+    blockExplorerUrls: [],
+  },
+  {
+    chainId: 545,
+    networkId: 545,
+    chainName: "Flow Testnet",
+    name: "Flow Testnet",
+    rpcUrls: ["https://testnet.evm.nodes.onflow.org"],
+    iconUrls: [],
+    nativeCurrency: {
+      name: "Flow",
+      symbol: "FLOW",
+      decimals: 18,
+    },
+    blockExplorerUrls: [],
+  },
+  {
+    chainId: 31,
+    networkId: 31,
+    chainName: "Rootstock Testnet",
+    name: "Rootstock Testnet",
+    rpcUrls: ["https://public-node.testnet.rsk.co"],
+    iconUrls: [],
+    nativeCurrency: {
+      name: "Rootstock",
+      symbol: "RBTC",
+      decimals: 18,
+    },
+    blockExplorerUrls: [],
+  },
+  {
+    chainId: 1564830818,
+    networkId: 1564830818,
+    chainName: "SKALE Network",
+    name: "SKALE Network",
+    rpcUrls: ["https://mainnet.skalenodes.com/v1/honorable-steel-rasalhague"],
+    iconUrls: [],
+    nativeCurrency: {
+      name: "SKALE",
+      symbol: "SKL",
+      decimals: 18,
+    },
+    blockExplorerUrls: [],
+  },
+];
+
 const App = () => {
   return (
     <DynamicContextProvider
       settings={{
         environmentId: env.NEXT_PUBLIC_DYNAMIC_ENV_ID,
         walletConnectors: [EthereumWalletConnectors],
+        overrides: {
+          evmNetworks: (networks) => mergeNetworks(myEvmNetworks, networks),
+        },
       }}
     >
       <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-100">
