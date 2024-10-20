@@ -127,14 +127,7 @@ export const anthropicInputJsonSchemaZodSchema = z.object({
   type: z.literal("object"),
   properties: z.record(
     z.string(),
-    z.object({
-      type: z.union([
-        z.enum(["string", "number", "boolean", "null"]),
-        z.array(z.enum(["string", "number", "boolean", "null"])),
-      ]),
-      description: z.string(),
-      enum: z.array(z.string()).optional(),
-    }),
+    z.unknown(), // to include everything else, like "enum"
   ),
   required: z.array(z.string()).optional(),
 });
@@ -144,6 +137,9 @@ export function getAnthropicInputJsonSchema(inputSchema: z.ZodSchema) {
   try {
     return anthropicInputJsonSchemaZodSchema.parse(result);
   } catch (e) {
+    console.error(
+      `Invalid anthropic tool input json schema:\n${JSON.stringify(result, null, 2)}`,
+    );
     throw e;
   }
 }
