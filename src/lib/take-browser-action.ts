@@ -32,7 +32,8 @@ export async function takeBrowserAction(opts: {
 
   if (action.type === "goto_url") {
     await page.goto(action.url);
-  } else if (action.type === "click") {
+  }
+  if (action.type === "click" || action.type === "click_and_type") {
     assert(opts.screenshot !== null);
 
     console.log(
@@ -70,19 +71,22 @@ export async function takeBrowserAction(opts: {
 
     // click there
     await page.mouse.click(clickX, clickY);
-  } else if (action.type === "type_characters") {
+  }
+  if (action.type === "type_characters" || action.type === "click_and_type") {
     await page.keyboard.type(action.characters, { delay: 100 });
-  } else if (action.type === "scroll") {
+  }
+  if (action.type === "scroll") {
     await page.mouse.wheel(0, (action.direction === "up" ? -1 : 1) * 400);
-  } else if (action.type === "press_special_key") {
-    await page.keyboard.press(action.key);
-  } else if (action.type === "wait_seconds") {
+  }
+  if (action.type === "press_special_key") {
+    await page.keyboard.press(
+      action.key.charAt(0).toUpperCase() + action.key.slice(1),
+    );
+  }
+  if (action.type === "wait_seconds") {
     const timeToWait =
       action.seconds - (Date.now() - opts.gotScreenshotAt.getTime()) / 1000;
     await new Promise((resolve) => setTimeout(resolve, timeToWait * 1000));
-  } else {
-    action satisfies never;
-    throw new Error("Unknown action type");
   }
 
   await new Promise((resolve) => setTimeout(resolve, 1500));

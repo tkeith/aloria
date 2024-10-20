@@ -16,6 +16,15 @@ const browserActionSchema = z.discriminatedUnion("type", [
       ),
   }),
   z.object({
+    type: z.literal("click_and_type"),
+    element_description: z
+      .string()
+      .describe(
+        `A detailed description of where to click, such as "the red right-arrow below the word 'Hello' in the navbar". Make sure to make it very specific.`,
+      ),
+    characters: z.string(),
+  }),
+  z.object({
     type: z.literal("goto_url"),
     url: z.string().url(),
   }),
@@ -191,6 +200,9 @@ function getActionDescription(action: BrowserAction): string {
     return `Pressing key: ${action.key}`;
   } else if (action.type === "wait_seconds") {
     return `Waiting for ${action.seconds} seconds`;
+  } else if (action.type === "click_and_type") {
+    return `Clicking on element "${action.element_description}" and typing "${action.characters}"`;
+  } else {
+    throw new Error("Unknown action type");
   }
-  throw new Error("Unknown action type");
 }

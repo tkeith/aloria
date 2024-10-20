@@ -1,23 +1,20 @@
 "use client";
 
+import { MiniStatus } from "@/components/MiniStatus";
+import { Status } from "@/components/Status";
 import { useAuthToken } from "@/lib/use-auth-token-hook";
 import { api } from "@/trpc/react";
 import React from "react";
 
-// Fake data for requests
-const fakeRequests = [
-  { extid: "1234567890", name: "Get User Profile" },
-  { extid: "1234567891", name: "Update Account Settings" },
-  { extid: "1234567892", name: "Fetch Product List" },
-  { extid: "1234567893", name: "Submit Order" },
-  { extid: "1234567894", name: "Generate Report" },
-];
-
 interface RequestListProps {
   onSelectRequest: (extid: string | null) => void;
+  selectedRequestExtid: string | null;
 }
 
-export function RequestList({ onSelectRequest }: RequestListProps) {
+export function RequestList({
+  onSelectRequest,
+  selectedRequestExtid,
+}: RequestListProps) {
   const authToken = useAuthToken();
 
   const requestsQuery = api.getRequests.useQuery(
@@ -35,7 +32,11 @@ export function RequestList({ onSelectRequest }: RequestListProps) {
     <div className="w-1/3">
       <div className="space-y-4">
         <div
-          className="cursor-pointer rounded-lg bg-white p-4 text-black shadow"
+          className={`cursor-pointer rounded-lg p-4 text-black shadow transition-colors ${
+            selectedRequestExtid === null
+              ? "bg-white ring-2 ring-blue-500"
+              : "bg-white hover:bg-gray-100"
+          }`}
           onClick={() => onSelectRequest(null)}
         >
           <h3 className="text-lg font-semibold">New Request</h3>
@@ -44,11 +45,20 @@ export function RequestList({ onSelectRequest }: RequestListProps) {
         {requestsQuery.data.requests.map((request) => (
           <div
             key={request.extid}
-            className="cursor-pointer rounded-lg bg-white p-4 shadow"
+            className={`cursor-pointer rounded-lg p-4 shadow transition-colors ${
+              selectedRequestExtid === request.extid
+                ? "bg-white ring-2 ring-blue-500"
+                : "bg-white hover:bg-gray-100"
+            }`}
             onClick={() => onSelectRequest(request.extid)}
           >
-            <h3 className="text-lg font-semibold">{request.name}</h3>
-            <p className="text-sm text-gray-600">ID: {request.extid}</p>
+            <div className="flex items-center space-x-4">
+              <Status status={request.status} />
+              <div className="flex-grow">
+                <h3 className="text-lg font-semibold">{request.name}</h3>
+                <p className="text-sm text-gray-600">ID: {request.extid}</p>
+              </div>
+            </div>
           </div>
         ))}
       </div>

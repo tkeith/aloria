@@ -18,16 +18,21 @@ export function Main() {
 
   return (
     <>
-      <main className="container mx-auto p-4">
-        <DynamicWidget />
+      <main className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-100 p-4">
+        <div className="container mx-auto">
+          <DynamicWidget />
 
-        <div className="mt-8 flex gap-8">
-          <RequestList onSelectRequest={handleSelectRequest} />
-          {selectedRequestExtid ? (
-            <RequestDetails selectedRequestExtid={selectedRequestExtid} />
-          ) : (
-            <NewRequest onSelectRequest={handleSelectRequest} />
-          )}
+          <div className="mt-8 flex gap-8">
+            <RequestList
+              onSelectRequest={handleSelectRequest}
+              selectedRequestExtid={selectedRequestExtid}
+            />
+            {selectedRequestExtid ? (
+              <RequestDetails selectedRequestExtid={selectedRequestExtid} />
+            ) : (
+              <NewRequest onSelectRequest={handleSelectRequest} />
+            )}
+          </div>
         </div>
       </main>
     </>

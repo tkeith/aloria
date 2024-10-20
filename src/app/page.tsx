@@ -62,11 +62,9 @@ const InsideDynamicContext = () => {
           </div>
         </main>
       ) : isAuthedQuery.data ? (
-        <>
-          <main className="h-screen bg-gradient-to-br from-blue-100 to-purple-100">
-            <Main />
-          </main>
-        </>
+        <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-100">
+          <Main />
+        </div>
       ) : (
         <NotAuthenticated />
       )}
@@ -82,7 +80,9 @@ const App = () => {
         walletConnectors: [EthereumWalletConnectors],
       }}
     >
-      <InsideDynamicContext />
+      <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-100">
+        <InsideDynamicContext />
+      </div>
     </DynamicContextProvider>
   );
 };
