@@ -4,7 +4,7 @@ import assert from "assert";
 import { Browser, Page } from "playwright";
 
 export type HistoricalAction = {
-  startingPage: { url: string; screenshot: Buffer } | null;
+  startingScreenshot: Buffer;
   action: BrowserAction;
   actionDescription: string;
   screenshotWithBoundingBox: Buffer | null;
@@ -22,11 +22,6 @@ export async function takeBrowserAction(opts: {
   let screenshotWithBoundingBox: Buffer | null = null;
 
   const { action, browser, page } = opts;
-
-  let startingUrl: string | null = page.url();
-  if (startingUrl === "about:blank") {
-    startingUrl = null;
-  }
 
   if (action.type === "goto_url") {
     await page.goto(action.url);
@@ -77,11 +72,10 @@ export async function takeBrowserAction(opts: {
     throw new Error("Unknown action type");
   }
 
+  await new Promise((resolve) => setTimeout(resolve, 1500));
+
   return {
-    startingPage:
-      startingUrl === null
-        ? null
-        : { url: startingUrl, screenshot: opts.screenshot! },
+    startingScreenshot: opts.screenshot!,
     action: opts.action,
     actionDescription: opts.actionDescription,
     screenshotWithBoundingBox,

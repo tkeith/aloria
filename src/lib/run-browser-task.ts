@@ -52,7 +52,5 @@ export async function runBrowserTask({ task }: { task: string }): Promise<{
       );
       console.log(`DEBUG: SAVED IMAGE TO ${outputPath}`);
     }
-
-    await new Promise((resolve) => setTimeout(resolve, 1500));
   }
 }
