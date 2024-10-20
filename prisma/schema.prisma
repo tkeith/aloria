@@ -22,6 +22,7 @@ model User {
 enum RequestStatus {
   Pending
   Completed
+  Canceled
 }
 
 model Request {
@@ -41,6 +42,7 @@ model Request {
 enum StepStatus {
   Pending
   Completed
+  Canceled
 }
 
 model Step {

@@ -2,7 +2,7 @@ import React from "react";
 import { Spinner } from "@/components/Spinner";
 
 interface StatusProps {
-  status: "Completed" | "Pending";
+  status: "Completed" | "Pending" | "Canceled";
 }
 
 export function Status({ status }: StatusProps) {
@@ -10,6 +10,14 @@ export function Status({ status }: StatusProps) {
     return (
       <span className="rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-800">
         Completed
+      </span>
+    );
+  }
+
+  if (status === "Canceled") {
+    return (
+      <span className="rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-800">
+        Canceled
       </span>
     );
   }

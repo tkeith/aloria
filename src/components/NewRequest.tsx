@@ -1,15 +1,17 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useAuthToken } from "@/lib/use-auth-token-hook";
 import { api } from "@/trpc/react";
+import { UserContextEditorModal } from "./UserContextEditorModal";
 
 interface NewRequestProps {
   onSelectRequest: (extid: string | null) => void;
 }
 
 export function NewRequest({ onSelectRequest }: NewRequestProps) {
+  const [isContextModalOpen, setIsContextModalOpen] = useState(false);
   const {
     register,
     handleSubmit,
@@ -56,15 +58,30 @@ export function NewRequest({ onSelectRequest }: NewRequestProps) {
               </p>
             )}
           </div>
-          <button
-            type="submit"
-            className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
-            disabled={createRequestMutation.isPending}
-          >
-            {createRequestMutation.isPending ? "Creating..." : "Create Request"}
-          </button>
+          <div className="flex items-center space-x-4">
+            <button
+              type="submit"
+              className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
+              disabled={createRequestMutation.isPending}
+            >
+              {createRequestMutation.isPending
+                ? "Creating..."
+                : "Create Request"}
+            </button>
+            <button
+              type="button"
+              className="text-blue-500 hover:text-blue-700"
+              onClick={() => setIsContextModalOpen(true)}
+            >
+              Edit Context
+            </button>
+          </div>
         </form>
       </div>
+      <UserContextEditorModal
+        isOpen={isContextModalOpen}
+        onClose={() => setIsContextModalOpen(false)}
+      />
     </div>
   );
 }

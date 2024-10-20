@@ -73,6 +73,10 @@ export async function takeBrowserAction(opts: {
     await page.mouse.click(clickX, clickY);
   }
   if (action.type === "type_characters" || action.type === "click_and_type") {
+    if (action.type === "click_and_type") {
+      // wait 1 second before typing
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
     await page.keyboard.type(action.characters, { delay: 100 });
   }
   if (action.type === "scroll") {

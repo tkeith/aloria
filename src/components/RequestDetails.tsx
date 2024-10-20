@@ -59,9 +59,7 @@ export function RequestDetails({ selectedRequestExtid }: RequestDetailsProps) {
           {steps.map((step, index) => (
             <div key={step.extid} className="mb-4 flex items-center space-x-4">
               <div className="flex flex-shrink-0 items-center space-x-4">
-                <MiniStatus
-                  status={step.status === "Pending" ? "Pending" : "Completed"}
-                />
+                <MiniStatus status={step.status} />
                 <span className="text-lg font-bold">{index + 1}</span>
               </div>
               <div className="flex-grow">
