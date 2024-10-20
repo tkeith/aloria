@@ -22,8 +22,10 @@ export const createRequest = procedure
       },
     });
 
-    await runRequest({
+    runRequest({
       requestId: newRequest.id,
+    }).catch((e) => {
+      console.error(e);
     });
 
     return { extid: newRequest.extid };

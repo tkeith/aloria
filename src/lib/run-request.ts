@@ -1,3 +1,4 @@
+import { generateRequestName } from "@/lib/generate-request-name";
 import { runBrowserTask } from "@/lib/run-browser-task";
 import { HistoricalAction } from "@/lib/take-browser-action";
 import { ParsedJson } from "@/lib/utils";
@@ -10,6 +11,11 @@ export async function runRequest({ requestId }: { requestId: number }) {
   });
 
   let currentStepId = null as number | null;
+
+  await db.request.update({
+    where: { id: requestId },
+    data: { name: await generateRequestName({ task: request.task }) },
+  });
 
   async function onStepStarted() {
     const step = await db.step.create({
