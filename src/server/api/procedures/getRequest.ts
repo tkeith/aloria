@@ -35,19 +35,22 @@ export const getRequest = procedure
     return {
       request: {
         extid: request.extid,
+        name: request.name,
         task: request.task,
         status: request.status,
         result: request.result,
         steps: request.steps.map((step) => ({
           extid: step.extid,
+          status: step.status,
           actionDescription: step.actionDescription,
           actionJson:
             step.actionJson === null
               ? null
               : (JSON.parse(step.actionJson) as ParsedJson),
-          startingScreenshot: step.startingScreenshot,
-          annotatedScreenshot: step.annotatedScreenshot,
-          endingScreenshot: step.endingScreenshot,
+          startingScreenshotBase64: step.startingScreenshot?.toString("base64"),
+          annotatedScreenshotBase64:
+            step.annotatedScreenshot?.toString("base64"),
+          endingScreenshotBase64: step.endingScreenshot?.toString("base64"),
         })),
       },
     };

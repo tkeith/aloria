@@ -25,6 +25,7 @@ export const getRequests = procedure
     return {
       requests: requests.map((request) => ({
         extid: request.extid,
+        name: request.name,
         task: request.task,
         status: request.status,
         result: request.result,

@@ -7,8 +7,8 @@ import { Toaster } from "react-hot-toast";
 import { TRPCReactProvider } from "@/trpc/react";
 
 export const metadata: Metadata = {
-  title: "App",
-  description: "",
+  title: "Aloria",
+  description: "Your AI personal assistant",
   icons: [
     // place favicon.ico in public folder and uncomment the following line
     // { rel: "icon", url: "/favicon.ico" }

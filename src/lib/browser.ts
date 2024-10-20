@@ -15,7 +15,9 @@ const iPhoneUserAgent =
 async function startChromiumBrowser(
   options: ChromiumOptions = {},
 ): Promise<{ browser: Browser; context: BrowserContext; page: Page }> {
-  const browser = await chromium.launch({ headless: false });
+  const browser = await chromium.launch({
+    headless: process.env.IN_CODAPT_CONTAINER === "true",
+  });
 
   const contextOptions = {
     viewport: {

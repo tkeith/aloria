@@ -8,6 +8,8 @@ import {
   createTRPCRouter,
   procedure,
 } from "@/server/api/trpc";
+import { getRequest } from "@/server/api/procedures/getRequest";
+import { getRequests } from "@/server/api/procedures/getRequests";
 
 /**
  * This is the primary router for your server.
@@ -20,6 +22,8 @@ export const appRouter = createTRPCRouter({
   getUserContext,
   setUserContext,
   createRequest,
+  getRequests,
+  getRequest,
 });
 
 // export type definition of API

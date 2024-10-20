@@ -180,17 +180,17 @@ First, describe what you see in the screenshot, including interactive components
 
 function getActionDescription(action: BrowserAction): string {
   if (action.type === "click") {
-    return `Clicked on element: ${action.element_description}`;
+    return `Clicking on element: ${action.element_description}`;
   } else if (action.type === "goto_url") {
-    return `Navigated to URL: ${action.url}`;
+    return `Navigating to URL: ${action.url}`;
   } else if (action.type === "scroll") {
-    return `Scrolled ${action.direction} by half a page`;
+    return `Scrolling ${action.direction} by half a page`;
   } else if (action.type === "type_characters") {
-    return `Typed characters: ${action.characters}`;
+    return `Typing characters: ${action.characters}`;
   } else if (action.type === "press_special_key") {
-    return `Pressed key: ${action.key}`;
+    return `Pressing key: ${action.key}`;
   } else if (action.type === "wait_seconds") {
-    return `Waited for ${action.seconds} seconds`;
+    return `Waiting for ${action.seconds} seconds`;
   }
   throw new Error("Unknown action type");
 }

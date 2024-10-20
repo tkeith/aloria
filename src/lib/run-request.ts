@@ -12,12 +12,23 @@ export async function runRequest({ requestId }: { requestId: number }) {
 
   let currentStepId = null as number | null;
 
+  async function setLatestStepToCompleted() {
+    if (currentStepId === null) {
+      return;
+    }
+    await db.step.update({
+      where: { id: currentStepId },
+      data: { status: "Completed" },
+    });
+  }
+
   await db.request.update({
     where: { id: requestId },
     data: { name: await generateRequestName({ task: request.task }) },
   });
 
   async function onStepStarted() {
+    await setLatestStepToCompleted();
     const step = await db.step.create({
       data: { requestId, extid: crypto.randomUUID() },
     });
@@ -66,10 +77,17 @@ export async function runRequest({ requestId }: { requestId: number }) {
     }
   }
 
-  await runBrowserTask({
+  const { result } = await runBrowserTask({
     task: request.task,
     userContext: request.user.context,
     onStepStarted,
     onStepUpdated,
+  });
+
+  await setLatestStepToCompleted();
+
+  await db.request.update({
+    where: { id: requestId },
+    data: { status: "Completed", result },
   });
 }
